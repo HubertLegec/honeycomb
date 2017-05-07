@@ -1,1 +1,1 @@
-Plaster ["CEFB", "..GAD", ".D.E.", "..F.G", "BGA."]
+Plaster ["CEFB", "..GAD", ".D.E", "..F.G", "BGA."]
