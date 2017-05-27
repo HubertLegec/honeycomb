@@ -1,6 +1,8 @@
 module App where
 import Types
 import Converters
+import FileUtils
+import UiUtils
 
 
 validatePlaster :: Plaster -> Bool
@@ -15,15 +17,11 @@ validatePlasterRow (x:xs) firstRowSize rowCounter oddEven | (length x) == (first
                                                           | otherwise = error ("Niepoprawna liczba pol w wierszu " ++ (show rowCounter) ++ " od dolu")
 
 
+
 main :: IO()
 main = do
-        putStrLn "Podaj nazwe pliku z zagadka:"
-        fileName <- getLine
-        fileText <- readFile fileName
-        let plaster :: Plaster
-            plaster = read fileText :: Plaster
-        let honeycomb :: HoneyComb
-            honeycomb = convertPlasterToHoneycomb plaster
+        plaster <- loadPlasterFromFile
+        let honeycomb = convertPlasterToHoneycomb plaster
         putStrLn ("Poprawna struktura: " ++ show (validatePlaster plaster))
-        putStrLn (show honeycomb)
+        showHoneycomb honeycomb
         putStrLn (show (convertHoneycombToPlaster honeycomb))
