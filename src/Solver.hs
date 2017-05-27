@@ -3,6 +3,12 @@ module Solver where
 import Types
 import Data.Maybe
 
+-- Rozwiązuje łamigłówkę
+-- Zwraca Nothing w przypadku braku rozwiązania
+-- Zwraca Just HoneyComb w przypadku znalezienia rozwiązania
+solve :: HoneyComb -> Maybe HoneyComb
+solve _ = Nothing
+
 -- Zwraca listę wszystkich współrzędnych punktów w plastrze
 findAllCoords :: HoneyComb -> [Coords]
 findAllCoords h = [
