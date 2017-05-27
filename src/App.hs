@@ -3,25 +3,27 @@ import Types
 import Converters
 import FileUtils
 import UiUtils
+import Validation
+import Solver
 
 
-validatePlaster :: Plaster -> Bool
-validatePlaster (Plaster []) = False
-validatePlaster (Plaster (x:xs)) = validatePlasterRow xs (length x) (length x) 1
-
-validatePlasterRow :: [String] -> Int -> Int -> Int -> Bool
-validatePlasterRow [] _ 0 _ = True
-validatePlasterRow [] _ _ _ = error "Nieodpowiednia liczba wierszy plastra"
-validatePlasterRow (x:xs) firstRowSize rowCounter oddEven | (length x) == (firstRowSize + oddEven) =
-                                                               validatePlasterRow xs firstRowSize (rowCounter - 1) (abs (oddEven - 1))
-                                                          | otherwise = error ("Niepoprawna liczba pol w wierszu " ++ (show rowCounter) ++ " od dolu")
-
+findSolution :: HoneyComb -> IO ()
+findSolution hc = do
+                   let result = solve hc
+                   if result == Nothing then
+                      putStrLn "Nie udalo sie znalezc rozwiazania"
+                   else
+                      saveHoneycombToFile result
 
 
 main :: IO()
 main = do
-        plaster <- loadPlasterFromFile
-        let honeycomb = convertPlasterToHoneycomb plaster
-        putStrLn ("Poprawna struktura: " ++ show (validatePlaster plaster))
+        textHoneycomb <- loadHoneycombFromFile
+        let honeycomb = convertTextReprToHoneycomb textHoneycomb
+        let isValid = validateHoneycomb honeycomb
+        putStrLn ("Wejsciowy plaster: ")
         showHoneycomb honeycomb
-        putStrLn (show (convertHoneycombToPlaster honeycomb))
+        if isValid then
+            findSolution honeycomb
+        else
+            putStrLn "Plik wejsciowy ma niepoprawna strukture!!!"

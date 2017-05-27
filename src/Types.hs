@@ -15,4 +15,5 @@ type Row = [Field]
 -- Typ opisujący cały plaster
 type HoneyComb = [Row]
 
-data Plaster = Plaster [String] deriving (Read, Show)
+-- Typ opisujący strukturę plastra odpowiadającą strukturze pliku wejściowego
+data TextHoneycomb = Plaster [String] deriving (Read, Show)

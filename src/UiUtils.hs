@@ -12,8 +12,8 @@ showRow row rowNum = do
 
 showHc [] _ = return ()
 showHc (x:xs) num = do
-                        showRow x num
-                        showHc xs (num + 1)
+                     showRow x num
+                     showHc xs (num + 1)
 
 showHoneycomb h = do
                    putStrLn " ---- honeycomb ---"
