@@ -2,6 +2,7 @@ module App where
 import Types
 import Converters
 import FileUtils
+import UiUtils
 
 
 validatePlaster :: Plaster -> Bool
@@ -16,10 +17,11 @@ validatePlasterRow (x:xs) firstRowSize rowCounter oddEven | (length x) == (first
                                                           | otherwise = error ("Niepoprawna liczba pol w wierszu " ++ (show rowCounter) ++ " od dolu")
 
 
+
 main :: IO()
 main = do
         plaster <- loadPlasterFromFile
         let honeycomb = convertPlasterToHoneycomb plaster
         putStrLn ("Poprawna struktura: " ++ show (validatePlaster plaster))
-        putStrLn (show honeycomb)
+        showHoneycomb honeycomb
         putStrLn (show (convertHoneycombToPlaster honeycomb))
