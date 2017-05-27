@@ -3,6 +3,15 @@ module Solver where
 import Types
 import Data.Maybe
 
+-- Zwraca listę wszystkich współrzędnych punktów w plastrze
+findAllCoords :: HoneyComb -> [Coords]
+findAllCoords h = [
+                        (Coord x y)
+                        |
+                        y <- [0 .. ((length h) - 1)],
+                        x <- [0 .. ((length (h !! y)) - 1)]
+                    ]
+
 -- Zwraca pole plastra o podanych współrzędnych X, Y liczonych od lewego górnego rogu.
 -- Jeśli pole nie istnieje - zwraca Nothig
 findFieldIfExists :: HoneyComb -> Coords -> Maybe Field
@@ -54,7 +63,6 @@ findFieldNeighbours h (Coord x y) =
             findFieldIfExists h (Coord (x + 0) (y + 1))
         ]
 
-
-
--- validateHoneyComb :: HoneyComb -> Bool
--- validateHoneyComb 
+-- Zwraca pozycję (środka) wokół której plaster miodu jest najbardziej uzupełniony
+--findAlmostFilledPlace :: [Coords] -> Maybe Coord
+    -- 
