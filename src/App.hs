@@ -1,5 +1,6 @@
 module App where
 import Types
+import Converters
 
 
 validatePlaster :: Plaster -> Bool
@@ -14,19 +15,6 @@ validatePlasterRow (x:xs) firstRowSize rowCounter oddEven | (length x) == (first
                                                           | otherwise = error ("Niepoprawna liczba pol w wierszu " ++ (show rowCounter) ++ " od dolu")
 
 
-convertCharToField :: Char -> Field
-convertCharToField '.' = Nothing
-convertCharToField c = Just c
-
-convertStringToRow :: String -> Row
-convertStringToRow "" = []
-convertStringToRow (x:xs) = (convertCharToField x) : convertStringToRow xs
-
-convertPlasterToHoneycomb :: Plaster -> HoneyComb
-convertPlasterToHoneycomb (Plaster []) = []
-convertPlasterToHoneycomb (Plaster (x:xs)) = (convertStringToRow x) : convertPlasterToHoneycomb (Plaster xs)
-
-
 main :: IO()
 main = do
         putStrLn "Podaj nazwe pliku z zagadka:"
@@ -38,3 +26,4 @@ main = do
             honeycomb = convertPlasterToHoneycomb plaster
         putStrLn ("Poprawna struktura: " ++ show (validatePlaster plaster))
         putStrLn (show honeycomb)
+        putStrLn (show (convertHoneycombToPlaster honeycomb))
