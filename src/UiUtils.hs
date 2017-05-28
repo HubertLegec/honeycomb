@@ -1,21 +1,23 @@
 module UiUtils where
-import Converters
+
+import Types
+
+import Data.List
+
+honeyCombFieldToString :: Field -> String
+honeyCombFieldToString Nothing = "-"
+honeyCombFieldToString (Just c) = [c]
+
+honeyCombRowToString :: Row -> Bool -> String
+honeyCombRowToString row pad = 
+    (if pad then " " else "") ++ intercalate " " (map honeyCombFieldToString row)
+
+honeyCombToStringImpl :: [Row] -> Bool -> String
+honeyCombToStringImpl [] _ = ""
+honeyCombToStringImpl (head:rest) pad =
+    (honeyCombRowToString head pad) ++ "\n" ++ (honeyCombToStringImpl rest (not pad))
 
 
-showRow row rowNum = do
-                      if (rowNum `mod` 2 == 0) then
-                        putStr " "
-                      else
-                        putStr ""
-                      putStrLn (concat [((convertFieldToChar x '_') : " ") | x <- row])
-
-
-showHc [] _ = return ()
-showHc (x:xs) num = do
-                     showRow x num
-                     showHc xs (num + 1)
-
-showHoneycomb h = do
-                   putStrLn " ---- honeycomb ---"
-                   showHc h 0
-                   putStrLn " ------------------"
+honeyCombToString :: HoneyComb -> String
+honeyCombToString h =
+    honeyCombToStringImpl h True

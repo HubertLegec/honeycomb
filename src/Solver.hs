@@ -1,74 +1,185 @@
 module Solver where
 
+import Utils
 import Types
+import UiUtils
+
+import Data.List
 import Data.Maybe
 
--- Rozwiązuje łamigłówkę
--- Zwraca Nothing w przypadku braku rozwiązania
--- Zwraca Just HoneyComb w przypadku znalezienia rozwiązania
-solve :: HoneyComb -> Maybe HoneyComb
-solve _ = Nothing
+import Debug.Trace
+import System.IO.Unsafe
+import Control.Concurrent
 
--- Zwraca listę wszystkich współrzędnych punktów w plastrze
-findAllCoords :: HoneyComb -> [Coords]
-findAllCoords h = [
-                        (Coord x y)
-                        |
-                        y <- [0 .. ((length h) - 1)],
-                        x <- [0 .. ((length (h !! y)) - 1)]
-                    ]
+import Control.Exception.Base
+
+solveOne :: HoneyComb -> (Maybe HoneyComb)
+solveOne h =
+    -- trace (honeyCombToString h) >>
+    if isSolved h then
+        Just h
+    else
+        let allHoneyCombs = [(coords, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
+            let validHoneyCombs = [replaceHoneyComb | (coords, replaceHoneyComb) <- allHoneyCombs, validateNeighbours replaceHoneyComb coords] in
+                solveList validHoneyCombs
+
+solveList :: [HoneyComb] -> (Maybe HoneyComb)
+solveList [] = Nothing
+solveList (h:tail) =
+    case (solveOne h) of
+        Just h -> Just h
+        Nothing -> solveList tail
+
+
+-- Zwraca listę wszystkich liter które mogą pojawić się na planszy
+honeyCombLetters :: [Char]
+honeyCombLetters = ['A' .. 'G']
+
+getField :: HoneyComb -> Coords -> FieldWithCoords
+getField h (Coords x y) = 
+    (FieldWithCoords (Coords x y) (h !! y !! x))
 
 -- Zwraca pole plastra o podanych współrzędnych X, Y liczonych od lewego górnego rogu.
 -- Jeśli pole nie istnieje - zwraca Nothig
-findFieldIfExists :: HoneyComb -> Coords -> Maybe Field
-findFieldIfExists h (Coord x y) =
+findFieldIfExists :: HoneyComb -> Coords -> Maybe FieldWithCoords
+findFieldIfExists h (Coords x y) =
     if y >= 0 && y < length h then
         let row = h !! y in
         if x >= 0 && x < length row then
             let field = row !! x in
-                Just field
+                Just (FieldWithCoords (Coords x y) field)
         else
             Nothing
     else
         Nothing
 
+-- Zwraca listę wszystkich współrzędnych punktów w plastrze
+getAllCoords :: HoneyComb -> [Coords]
+getAllCoords h = [
+                        (Coords x y)
+                        |
+                        y <- [0 .. ((length h) - 1)],
+                        x <- [0 .. ((length (h !! y)) - 1)]
+                    ]
+
+-- Zwraca listę wszystkich pól w plastrze - zwartości wraz ze współrzędnymi
+getAllFields :: HoneyComb -> [FieldWithCoords]
+getAllFields h =
+    [getField h coords | coords <- (getAllCoords h)]
+
+-- Zwraca nowy plaster, w którym na podanych współrzędnych znajduje się nowa litera
+replaceHoneyComb :: HoneyComb -> Coords -> Char -> HoneyComb
+replaceHoneyComb h (Coords x y) with = 
+
+    -- Upewnij się, że pole, które zmieniamy jest puste
+    assert (
+        isNothing (
+            (\(FieldWithCoords coords field) -> field)
+            (getField h (Coords x y))
+        )
+    )
+
+    -- Podmień podane pole
+    replace2 (Just with) (x, y) h
+
 -- Zwraca listę wszystkich pól przylegających do pola o współrzędnych X,Y wraz z tym polem
-findFieldNeighbours :: HoneyComb -> Coords -> [Field]
-findFieldNeighbours h (Coord x y) =
+findFieldNeighbours :: HoneyComb -> Coords -> [FieldWithCoords]
+findFieldNeighbours h (Coords x y) =
     -- W zależności od tego, czy jesteśmy w szerszym czy węższym wierszu - bierzemy klocki z wyższego i niższego przesunięte o 1 w lewo albo prawo
-    if even x then
-        -- Węższy
-        catMaybes [
-            -- Wyższy wiersz
-            findFieldIfExists h (Coord (x + 0) (y - 1)),
-            findFieldIfExists h (Coord (x + 1) (y - 1)),
+    let rowLength = (length (h !! y)) in
+        if (rowLength + 1 == length h) then
+            -- Węższy
+            catMaybes [
+                -- Wyższy wiersz
+                findFieldIfExists h (Coords (x + 0) (y - 1)),
+                findFieldIfExists h (Coords (x + 1) (y - 1)),
 
-            -- Ten wiersz
-            findFieldIfExists h (Coord (x + 0) (y + 0)), -- Ten
-            findFieldIfExists h (Coord (x - 1) (y + 0)), -- Po lewej
-            findFieldIfExists h (Coord (x + 1) (y + 0)), -- Po prawej
+                -- Ten wiersz
+                findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
+                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
-            -- Niższy wiersz wiersz
-            findFieldIfExists h (Coord (x + 0) (y + 1)),
-            findFieldIfExists h (Coord (x + 1) (y + 1))
-        ]
-    else
-        -- Szerszy
-        catMaybes [
-            -- Wyższy wiersz
-            findFieldIfExists h (Coord (x - 1) (y - 1)),
-            findFieldIfExists h (Coord (x + 0) (y - 1)),
+                -- Niższy wiersz wiersz
+                findFieldIfExists h (Coords (x + 0) (y + 1)),
+                findFieldIfExists h (Coords (x + 1) (y + 1))
+            ]
+        else if (rowLength == length h) then
+            -- Szerszy
+            catMaybes [
+                -- Wyższy wiersz
+                findFieldIfExists h (Coords (x - 1) (y - 1)),
+                findFieldIfExists h (Coords (x + 0) (y - 1)),
 
-            -- Ten wiersz
-            findFieldIfExists h (Coord (x + 0) (y + 0)), -- Ten
-            findFieldIfExists h (Coord (x - 1) (y + 0)), -- Po lewej
-            findFieldIfExists h (Coord (x + 1) (y + 0)), -- Po prawej
+                -- Ten wiersz
+                findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
+                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
-            -- Niższy wiersz wiersz
-            findFieldIfExists h (Coord (x - 1) (y + 1)),
-            findFieldIfExists h (Coord (x + 0) (y + 1))
-        ]
+                -- Niższy wiersz wiersz
+                findFieldIfExists h (Coords (x - 1) (y + 1)),
+                findFieldIfExists h (Coords (x + 0) (y + 1))
+            ]
+        else
+            error "Invalid row length"
 
--- Zwraca pozycję (środka) wokół której plaster miodu jest najbardziej uzupełniony
---findAlmostFilledPlace :: [Coords] -> Maybe Coord
-    -- 
+-- Zwraca zestaw wszystkich punktów wraz z odpowiadającymi im sąsiadami
+getAllFieldsNeighbours :: HoneyComb -> [(FieldWithCoords, [FieldWithCoords])]
+getAllFieldsNeighbours h =
+    [((FieldWithCoords coords field), findFieldNeighbours h coords) | (FieldWithCoords coords field) <- getAllFields h]
+
+getEmptyPointsSortedByNeighboursFillRatio :: HoneyComb -> [Coords]
+getEmptyPointsSortedByNeighboursFillRatio h =
+
+    map
+    (\
+        ((FieldWithCoords coords _), _) ->
+            coords
+    )
+    (
+    -- Posortuj według ilości pustych punktów otoczenia
+    -- sortBy
+    --    (\
+    --        (_, l1) (_, l2) ->
+    --            compare (length l1) (length l2)
+    --    )
+        (
+            -- Weź tylko puste punkty
+            filter
+                (\
+                    ((FieldWithCoords _ field), _) ->
+                        isNothing field
+                )
+                (getAllFieldsNeighbours h)
+        )
+    )
+
+
+-- Sprawdza, czy punkt o podanych współrzędnych zawiera prawidłowe sąsiedztwo - nie ma duplikatów
+validateNeighbours :: HoneyComb -> Coords -> Bool
+validateNeighbours h coords =
+    -- Sprawdź, czy nie ma duplikatów
+    isListUnique (
+        -- Usuń puste pola
+        catMaybes (
+            -- Z każdego pola z otoczenia pobierz tylko wartość
+            map
+                (\(FieldWithCoords coords field) -> field)
+                (findFieldNeighbours h coords)
+        )
+    )
+
+validateHoneyComb :: HoneyComb -> Bool
+validateHoneyComb h = 
+    all (== True) [validateNeighbours h coords | coords <- getAllCoords h]
+
+isSolved :: HoneyComb -> Bool
+isSolved h = 
+    -- Wszystkie
+    all (== True)
+    (
+        -- Pola są uzupełnione
+        map (\ (FieldWithCoords coords field) -> isJust field)
+
+        -- Na liście pól
+        (getAllFields h)
+    )
