@@ -1,7 +1,6 @@
 module Samples where
 
 import Solver
-import UiUtils
 
 -- Z zadania
 honeyComb1 = [

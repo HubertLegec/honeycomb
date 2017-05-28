@@ -2,7 +2,6 @@ module Solver where
 
 import Utils
 import Types
-import UiUtils
 
 import Data.List
 import Data.Maybe
