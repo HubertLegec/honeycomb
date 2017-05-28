@@ -7,21 +7,18 @@ import UiUtils
 import Data.List
 import Data.Maybe
 
-import Debug.Trace
-import System.IO.Unsafe
-import Control.Concurrent
-
 import Control.Exception.Base
 
 solveOne :: HoneyComb -> (Maybe HoneyComb)
 solveOne h =
-    -- trace (honeyCombToString h) >>
+    --trace ((honeyCombToString h) ++ "-------------------------------------------------------------------------------------------------------------------------\n\n") (
     if isSolved h then
         Just h
     else
         let allHoneyCombs = [(coords, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
             let validHoneyCombs = [replaceHoneyComb | (coords, replaceHoneyComb) <- allHoneyCombs, validateNeighbours replaceHoneyComb coords] in
                 solveList validHoneyCombs
+    --)
 
 solveList :: [HoneyComb] -> (Maybe HoneyComb)
 solveList [] = Nothing
@@ -127,6 +124,10 @@ getAllFieldsNeighbours :: HoneyComb -> [(FieldWithCoords, [FieldWithCoords])]
 getAllFieldsNeighbours h =
     [((FieldWithCoords coords field), findFieldNeighbours h coords) | (FieldWithCoords coords field) <- getAllFields h]
 
+getNothingCount :: [FieldWithCoords] -> Int
+getNothingCount list =
+    length (filter isNothing (map (\(FieldWithCoords _ field) -> field) list))
+
 getEmptyPointsSortedByNeighboursFillRatio :: HoneyComb -> [Coords]
 getEmptyPointsSortedByNeighboursFillRatio h =
 
@@ -137,10 +138,10 @@ getEmptyPointsSortedByNeighboursFillRatio h =
     )
     (
     -- Posortuj według ilości pustych punktów otoczenia
-    -- sortBy
+    --sortBy
     --    (\
-    --        (_, l1) (_, l2) ->
-    --            compare (length l1) (length l2)
+    --       (_, l1) (_, l2) ->
+    --            compare (getNothingCount l1) (getNothingCount l2)
     --    )
         (
             -- Weź tylko puste punkty
