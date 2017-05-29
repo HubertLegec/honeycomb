@@ -25,13 +25,13 @@ honeycombToString h =
 
 showHoneycomb :: Honeycomb -> IO ()
 showHoneycomb h = do
-	putStrLn " ---- honeycomb ---"
-	putStrLn (honeycombToString h)
-	putStrLn " ------------------"
+    putStrLn " ---- honeycomb ---"
+    putStrLn (honeycombToString h)
+    putStrLn " ------------------"
 
 showResult :: Maybe Honeycomb -> IO ()
 showResult (Just hc) = do
-	putStrLn "Rozwiazanie:"
-	showHoneycomb hc
+    putStrLn "Rozwiazanie:"
+    showHoneycomb hc
 showResult _ =
-	putStrLn "Nie udalo sie znalezc rozwiazania"
+    putStrLn "Nie udalo sie znalezc rozwiazania"
