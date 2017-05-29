@@ -8,26 +8,26 @@ honeycombFieldToString :: Field -> String
 honeycombFieldToString Nothing = "-"
 honeycombFieldToString (Just c) = [c]
 
-honeycombRowToString :: Row -> Bool -> String
-honeycombRowToString row pad = 
-    (if pad then " " else "") ++ intercalate " " (map honeycombFieldToString row)
+honeycombRowToString :: Row -> Bool -> Int -> String
+honeycombRowToString row padRow padAll = 
+    (replicate padAll ' ') ++ (if padRow then " " else "") ++ intercalate " " (map honeycombFieldToString row)
 
-honeycombToStringImpl :: [Row] -> Bool -> String
-honeycombToStringImpl [] _ = ""
-honeycombToStringImpl (head:rest) pad =
-    (honeycombRowToString head pad) ++ "\n" ++ (honeycombToStringImpl rest (not pad))
+honeycombToStringImpl :: [Row] -> Bool -> Int -> String
+honeycombToStringImpl [] _ _ = ""
+honeycombToStringImpl (head:rest) padRow padAll =
+    (honeycombRowToString head padRow padAll) ++ "\n" ++ (honeycombToStringImpl rest (not padRow) padAll)
 
 
-honeycombToString :: Honeycomb -> String
-honeycombToString h =
-    honeycombToStringImpl h True
+honeycombToString :: Honeycomb -> Int -> String
+honeycombToString h padAll =
+    honeycombToStringImpl h True padAll
 
 
 showHoneycomb :: Honeycomb -> IO ()
 showHoneycomb h = do
-    putStrLn " ---- honeycomb ---"
-    putStrLn (honeycombToString h)
-    putStrLn " ------------------"
+    putStrLn "---- honeycomb ---"
+    putStr (honeycombToString h 1)
+    putStrLn "------------------"
 
 showResult :: Maybe Honeycomb -> IO ()
 showResult (Just hc) = do
