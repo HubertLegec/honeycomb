@@ -11,8 +11,8 @@ convertStringToRow :: String -> Row
 convertStringToRow "" = []
 convertStringToRow (x:xs) = (convertCharToField x) : convertStringToRow xs
 
--- zamień reprezentację plastra z postaci pliku wejściowego na typ HoneyComb
-convertTextReprToHoneycomb :: TextHoneycomb -> HoneyComb
+-- zamień reprezentację plastra z postaci pliku wejściowego na typ Honeycomb
+convertTextReprToHoneycomb :: TextHoneycomb -> Honeycomb
 convertTextReprToHoneycomb (Plaster []) = []
 convertTextReprToHoneycomb (Plaster (x:xs)) = (convertStringToRow x) : convertTextReprToHoneycomb (Plaster xs)
 
@@ -27,6 +27,6 @@ convertRowToString [] = ""
 convertRowToString (x:xs) = (convertFieldToChar x '.') : convertRowToString xs
 
 -- zamień typ Honeycomb na reprezentację zgodną z plikiem wejściowym
-convertHoneycombToTextRepr :: HoneyComb -> TextHoneycomb
+convertHoneycombToTextRepr :: Honeycomb -> TextHoneycomb
 convertHoneycombToTextRepr [] = Plaster []
 convertHoneycombToTextRepr hc = Plaster [convertRowToString x | x <- hc]
