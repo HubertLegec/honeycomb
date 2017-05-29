@@ -13,23 +13,23 @@ import UiUtils
 
 solveOne :: Honeycomb -> Maybe Honeycomb
 solveOne h = 
-	--trace ( honeycombToString h 0 ) (
-	if validateHoneycomb h then
-		if isSolved h then
-			Just h
-		else
-			solveOneCoordsChars h (getEmptyCoords h) honeycombLetters
-	else
-		Nothing
-	--)
+    --trace ( honeycombToString h 0 ) (
+    if validateHoneycomb h then
+        if isSolved h then
+            Just h
+        else
+            solveOneCoordsChars h (getEmptyCoords h) honeycombLetters
+    else
+        Nothing
+    --)
 
 solveOneCoordsChars :: Honeycomb -> Coords -> [Char] -> Maybe Honeycomb
 solveOneCoordsChars h c [] = Nothing
 solveOneCoordsChars h c (x:xs) = 
-	let replacedHoneycomb = replaceHoneycomb h c x in
-		case solveOne replacedHoneycomb of
-			Just h -> Just h
-			Nothing -> solveOneCoordsChars h c xs
+    let replacedHoneycomb = replaceHoneycomb h c x in
+        case solveOne replacedHoneycomb of
+            Just h -> Just h
+            Nothing -> solveOneCoordsChars h c xs
 
 -- Zwraca listę wszystkich liter które mogą pojawić się na planszy
 honeycombLetters :: [Char]
@@ -126,23 +126,23 @@ findFieldNeighbours h (Coords x y) =
 
 getEmptyCoords :: Honeycomb -> Coords
 getEmptyCoords h =
-	case getEmptyCoordsHoneycomb 0 h of
-		Nothing -> error "Not found"
-		Just x -> x
+    case getEmptyCoordsHoneycomb 0 h of
+        Nothing -> error "Not found"
+        Just x -> x
 
 getEmptyCoordsHoneycomb :: Int -> Honeycomb -> Maybe Coords
 getEmptyCoordsHoneycomb _ [] = Nothing
 getEmptyCoordsHoneycomb y (h:t) =
-	case getEmptyCoordsRow y 0 h of
-		Just coords -> Just coords
-		Nothing -> getEmptyCoordsHoneycomb (y + 1) t
+    case getEmptyCoordsRow y 0 h of
+        Just coords -> Just coords
+        Nothing -> getEmptyCoordsHoneycomb (y + 1) t
 
 getEmptyCoordsRow :: Int -> Int -> Row -> Maybe Coords
 getEmptyCoordsRow _ _ [] = Nothing
 getEmptyCoordsRow y x (h:t) = 
-	case h of
-		Nothing -> Just (Coords x y)
-		Just _ -> getEmptyCoordsRow y (x + 1) t
+    case h of
+        Nothing -> Just (Coords x y)
+        Just _ -> getEmptyCoordsRow y (x + 1) t
 
 -- Sprawdza, czy punkt o podanych współrzędnych zawiera prawidłowe sąsiedztwo - nie ma duplikatów
 validateNeighbours :: Honeycomb -> Coords -> Bool
@@ -160,19 +160,19 @@ validateNeighbours h coords =
 
 validateRow :: Row -> Bool
 validateRow row =
-	isListUnique (catMaybes row)
+    isListUnique (catMaybes row)
 
 validateRows :: [Row] -> Bool
 validateRows [] = True
 validateRows (x:xs) =
-	(validateRow x) && (validateRows xs)
+    (validateRow x) && (validateRows xs)
 
 validateAllNeighbours :: Honeycomb -> [Coords] -> Bool
 validateAllNeighbours _ [] = True
 validateAllNeighbours h (x:xs) =
-	(validateNeighbours h x)
-	&&
-	(validateAllNeighbours h xs)
+    (validateNeighbours h x)
+    &&
+    (validateAllNeighbours h xs)
 
 
 -- Sprawdza poprawność całego plastra
@@ -180,7 +180,7 @@ validateHoneycomb :: Honeycomb -> Bool
 validateHoneycomb h = 
     (validateRows h)
     &&
-	(validateAllNeighbours h (getAllCoords h))
+    (validateAllNeighbours h (getAllCoords h))
 
 -- sprawdza czy wszystkie pola w wierszu są uzupełnione
 isRowSolved :: Row -> Bool
