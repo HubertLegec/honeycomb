@@ -8,15 +8,20 @@ import Data.Maybe
 
 import Control.Exception.Base
 
+import Debug.Trace
+import UiUtils
+
 -- Rozwiązuje podany plaster miodu
 solveOne :: Honeycomb -> (Maybe Honeycomb)
 solveOne h =
+	trace ( (honeycombToString h) ) (
     if isSolved h then
             Just h
     else
         let allHoneycombs = [(coords, char, replaceHoneycomb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeycombLetters] in
             let validHoneycombs = [replacedHoneycomb | (coords, char, replacedHoneycomb) <- allHoneycombs, validateHoneycomb replacedHoneycomb] in
                 solveList validHoneycombs
+    )
 
 -- Pomocnicza funkcja próbująca po kolei rozwiązać każdy z podanych plastrów.
 -- Kończ się w chwili znalezienia pierwszego rozwiązania
@@ -143,7 +148,7 @@ getEmptyPointsSortedByNeighboursFillRatio h =
     --sortBy
     --    (\
     --       (_, l1) (_, l2) ->
-    --            compare (getNothingCount l1) (getNothingCount l2)
+    --            compare (getNothingCount l2) (getNothingCount l1)
     --    )
         (
             -- Weź tylko puste punkty
@@ -171,10 +176,29 @@ validateNeighbours h coords =
         )
     )
 
+validateRow :: Row -> Bool
+validateRow row =
+	isListUnique (catMaybes row)
+
+validateRows :: [Row] -> Bool
+validateRows [] = True
+validateRows (x:xs) =
+	(validateRow x) && (validateRows xs)
+
+validateAllNeighbours :: Honeycomb -> [Coords] -> Bool
+validateAllNeighbours _ [] = True
+validateAllNeighbours h (x:xs) =
+	(validateNeighbours h x)
+	&&
+	(validateAllNeighbours h xs)
+
+
 -- Sprawdza poprawność całego plastra
 validateHoneycomb :: Honeycomb -> Bool
 validateHoneycomb h = 
-    all (== True) [validateNeighbours h coords | coords <- getAllCoords h]
+    (validateRows h)
+    &&
+    (validateAllNeighbours h (getAllCoords h))
 
 -- Sprawdza, czy podany plaster miodu jest ułożony.
 -- Nie sprawdza poprawności, jedynie uzupełnienie wszystkich pól
