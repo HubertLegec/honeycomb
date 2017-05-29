@@ -12,10 +12,12 @@ solveOne :: HoneyComb -> (Maybe HoneyComb)
 solveOne h =
     --trace ((honeyCombToString h) ++ "-------------------------------------------------------------------------------------------------------------------------\n\n") (
     if isSolved h then
-        Just h
+        assert
+            (validateHoneyComb h)
+            Just h
     else
-        let allHoneyCombs = [(coords, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
-            let validHoneyCombs = [replaceHoneyComb | (coords, replaceHoneyComb) <- allHoneyCombs, validateNeighbours replaceHoneyComb coords] in
+        let allHoneyCombs = [(coords, char, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
+            let validHoneyCombs = [replaceHoneyComb | (coords, char, replaceHoneyComb) <- allHoneyCombs, validateNeighbours replaceHoneyComb coords char] in
                 solveList validHoneyCombs
     --)
 
@@ -78,12 +80,12 @@ replaceHoneyComb h (Coords x y) with =
     -- Podmień podane pole
     replace2 (Just with) (x, y) h
 
--- Zwraca listę wszystkich pól przylegających do pola o współrzędnych X,Y wraz z tym polem
+-- Zwraca listę wszystkich pól przylegających do pola o współrzędnych X,Y
 findFieldNeighbours :: HoneyComb -> Coords -> [FieldWithCoords]
 findFieldNeighbours h (Coords x y) =
     -- W zależności od tego, czy jesteśmy w szerszym czy węższym wierszu - bierzemy klocki z wyższego i niższego przesunięte o 1 w lewo albo prawo
     let rowLength = (length (h !! y)) in
-        if (rowLength + 1 == length h) then
+        if ((rowLength + 1) == (length h)) then
             -- Węższy
             catMaybes [
                 -- Wyższy wiersz
@@ -92,14 +94,14 @@ findFieldNeighbours h (Coords x y) =
 
                 -- Ten wiersz
                 findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
-                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                --findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
                 findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
                 -- Niższy wiersz wiersz
                 findFieldIfExists h (Coords (x + 0) (y + 1)),
                 findFieldIfExists h (Coords (x + 1) (y + 1))
             ]
-        else if (rowLength == length h) then
+        else if ((rowLength == length h)) then
             -- Szerszy
             catMaybes [
                 -- Wyższy wiersz
@@ -108,7 +110,7 @@ findFieldNeighbours h (Coords x y) =
 
                 -- Ten wiersz
                 findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
-                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                --findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
                 findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
                 -- Niższy wiersz wiersz
@@ -155,22 +157,30 @@ getEmptyPointsSortedByNeighboursFillRatio h =
 
 
 -- Sprawdza, czy punkt o podanych współrzędnych zawiera prawidłowe sąsiedztwo - nie ma duplikatów
-validateNeighbours :: HoneyComb -> Coords -> Bool
-validateNeighbours h coords =
-    -- Sprawdź, czy nie ma duplikatów
-    isListUnique (
-        -- Usuń puste pola
-        catMaybes (
-            -- Z każdego pola z otoczenia pobierz tylko wartość
-            map
-                (\(FieldWithCoords coords field) -> field)
-                (findFieldNeighbours h coords)
+validateNeighbours :: HoneyComb -> Coords -> Char -> Bool
+validateNeighbours h coords char =
+    all
+    (== False)
+    (
+        map
+        (\
+            (FieldWithCoords _ field) ->
+                case field of
+                    Just c -> c == char
+                    Nothing -> False
         )
+        (findFieldNeighbours h coords)
     )
+
+assumeChar :: HoneyComb -> Coords -> Char
+assumeChar h coords =
+    case (\(FieldWithCoords _ f) -> f) $ (getField h coords) of
+        Just a -> a
+        Nothing -> error "Nothing"
 
 validateHoneyComb :: HoneyComb -> Bool
 validateHoneyComb h = 
-    all (== True) [validateNeighbours h coords | coords <- getAllCoords h]
+    all (== True) [validateNeighbours h coords (assumeChar h coords) | coords <- getAllCoords h]
 
 isSolved :: HoneyComb -> Bool
 isSolved h = 
