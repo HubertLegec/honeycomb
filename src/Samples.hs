@@ -30,7 +30,7 @@ honeyComb3 = [
     ]
 
 honeyComb10 = [
-        [Just 'C', Just 'E', Just 'F', Just 'B'],
+        [Just 'C', Just 'E', Just 'C', Just 'B'],
         [Just 'F', Just 'B', Just 'G', Just 'A', Just 'D'],
         [Just 'A', Just 'D', Just 'C', Just 'E'],
         [Just 'C', Just 'E', Just 'F', Just 'B', Just 'G'],
