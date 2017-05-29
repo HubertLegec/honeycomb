@@ -11,27 +11,25 @@ import Control.Exception.Base
 import Debug.Trace
 import UiUtils
 
--- Rozwiązuje podany plaster miodu
-solveOne :: Honeycomb -> (Maybe Honeycomb)
-solveOne h =
-	trace ( (honeycombToString h) ) (
-    if isSolved h then
-            Just h
-    else
-        let allHoneycombs = [(coords, char, replaceHoneycomb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeycombLetters] in
-            let validHoneycombs = [replacedHoneycomb | (coords, char, replacedHoneycomb) <- allHoneycombs, validateHoneycomb replacedHoneycomb] in
-                solveList validHoneycombs
-    )
+solveOne :: Honeycomb -> Maybe Honeycomb
+solveOne h = 
+	--trace ( honeycombToString h 0 ) (
+	if validateHoneycomb h then
+		if isSolved h then
+			Just h
+		else
+			solveOneCoordsChars h (getEmptyCoords h) honeycombLetters
+	else
+		Nothing
+	--)
 
--- Pomocnicza funkcja próbująca po kolei rozwiązać każdy z podanych plastrów.
--- Kończ się w chwili znalezienia pierwszego rozwiązania
-solveList :: [Honeycomb] -> (Maybe Honeycomb)
-solveList [] = Nothing
-solveList (h:tail) =
-    case (solveOne h) of
-        Just h -> Just h
-        Nothing -> solveList tail
-
+solveOneCoordsChars :: Honeycomb -> Coords -> [Char] -> Maybe Honeycomb
+solveOneCoordsChars h c [] = Nothing
+solveOneCoordsChars h c (x:xs) = 
+	let replacedHoneycomb = replaceHoneycomb h c x in
+		case solveOne replacedHoneycomb of
+			Just h -> Just h
+			Nothing -> solveOneCoordsChars h c xs
 
 -- Zwraca listę wszystkich liter które mogą pojawić się na planszy
 honeycombLetters :: [Char]
@@ -99,7 +97,7 @@ findFieldNeighbours h (Coords x y) =
 
                 -- Ten wiersz
                 findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
-                --findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
                 findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
                 -- Niższy wiersz wiersz
@@ -115,7 +113,7 @@ findFieldNeighbours h (Coords x y) =
 
                 -- Ten wiersz
                 findFieldIfExists h (Coords (x - 1) (y + 0)), -- Po lewej
-                --findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
+                findFieldIfExists h (Coords (x + 0) (y + 0)), -- Ten
                 findFieldIfExists h (Coords (x + 1) (y + 0)), -- Po prawej
 
                 -- Niższy wiersz wiersz
@@ -125,42 +123,26 @@ findFieldNeighbours h (Coords x y) =
         else
             error "Invalid row length"
 
--- Zwraca zestaw wszystkich punktów wraz z odpowiadającymi im sąsiadami
-getAllFieldsNeighbours :: Honeycomb -> [(FieldWithCoords, [FieldWithCoords])]
-getAllFieldsNeighbours h =
-    [((FieldWithCoords coords field), findFieldNeighbours h coords) | (FieldWithCoords coords field) <- getAllFields h]
 
--- Zwraca ile pól spośród podanej listy jest pustych
-getNothingCount :: [FieldWithCoords] -> Int
-getNothingCount list =
-    length (filter isNothing (map (\(FieldWithCoords _ field) -> field) list))
+getEmptyCoords :: Honeycomb -> Coords
+getEmptyCoords h =
+	case getEmptyCoordsHoneycomb 0 h of
+		Nothing -> error "Not found"
+		Just x -> x
 
-getEmptyPointsSortedByNeighboursFillRatio :: Honeycomb -> [Coords]
-getEmptyPointsSortedByNeighboursFillRatio h =
-    -- Wytnij tylko współrzędne
-    map
-    (\
-        ((FieldWithCoords coords _), _) ->
-            coords
-    )
-    (
-    -- Posortuj według ilości pustych punktów otoczenia
-    --sortBy
-    --    (\
-    --       (_, l1) (_, l2) ->
-    --            compare (getNothingCount l2) (getNothingCount l1)
-    --    )
-        (
-            -- Weź tylko puste punkty
-            filter
-                (\
-                    ((FieldWithCoords _ field), _) ->
-                        isNothing field
-                )
-                (getAllFieldsNeighbours h)
-        )
-    )
+getEmptyCoordsHoneycomb :: Int -> Honeycomb -> Maybe Coords
+getEmptyCoordsHoneycomb _ [] = Nothing
+getEmptyCoordsHoneycomb y (h:t) =
+	case getEmptyCoordsRow y 0 h of
+		Just coords -> Just coords
+		Nothing -> getEmptyCoordsHoneycomb (y + 1) t
 
+getEmptyCoordsRow :: Int -> Int -> Row -> Maybe Coords
+getEmptyCoordsRow _ _ [] = Nothing
+getEmptyCoordsRow y x (h:t) = 
+	case h of
+		Nothing -> Just (Coords x y)
+		Just _ -> getEmptyCoordsRow y (x + 1) t
 
 -- Sprawdza, czy punkt o podanych współrzędnych zawiera prawidłowe sąsiedztwo - nie ma duplikatów
 validateNeighbours :: Honeycomb -> Coords -> Bool
@@ -172,7 +154,7 @@ validateNeighbours h coords =
             -- Z każdego pola z otoczenia pobierz tylko wartość
             map
                 (\(FieldWithCoords coords field) -> field)
-                ((findFieldNeighbours h coords) ++ [getField h coords])
+                ((findFieldNeighbours h coords))
         )
     )
 
@@ -198,7 +180,7 @@ validateHoneycomb :: Honeycomb -> Bool
 validateHoneycomb h = 
     (validateRows h)
     &&
-    (validateAllNeighbours h (getAllCoords h))
+	(validateAllNeighbours h (getAllCoords h))
 
 -- sprawdza czy wszystkie pola w wierszu są uzupełnione
 isRowSolved :: Row -> Bool
