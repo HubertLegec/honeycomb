@@ -12,12 +12,12 @@ solveOne :: HoneyComb -> (Maybe HoneyComb)
 solveOne h =
     --trace ((honeyCombToString h) ++ "-------------------------------------------------------------------------------------------------------------------------\n\n") (
     if isSolved h then
-        assert
-            (validateHoneyComb h)
+        --assert
+        --    (validateHoneyComb h)
             Just h
     else
         let allHoneyCombs = [(coords, char, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
-            let validHoneyCombs = [replaceHoneyComb | (coords, char, replaceHoneyComb) <- allHoneyCombs, validateNeighbours replaceHoneyComb coords char] in
+            let validHoneyCombs = [replacedHoneyComb | (coords, char, replacedHoneyComb) <- allHoneyCombs, validateHoneyComb replacedHoneyComb] in
                 solveList validHoneyCombs
     --)
 
@@ -125,13 +125,14 @@ getAllFieldsNeighbours :: HoneyComb -> [(FieldWithCoords, [FieldWithCoords])]
 getAllFieldsNeighbours h =
     [((FieldWithCoords coords field), findFieldNeighbours h coords) | (FieldWithCoords coords field) <- getAllFields h]
 
+-- Zwraca ile pól spośród podanej listy jest pustych
 getNothingCount :: [FieldWithCoords] -> Int
 getNothingCount list =
     length (filter isNothing (map (\(FieldWithCoords _ field) -> field) list))
 
 getEmptyPointsSortedByNeighboursFillRatio :: HoneyComb -> [Coords]
 getEmptyPointsSortedByNeighboursFillRatio h =
-
+	-- Wytnij tylko współrzędne
     map
     (\
         ((FieldWithCoords coords _), _) ->
@@ -157,30 +158,23 @@ getEmptyPointsSortedByNeighboursFillRatio h =
 
 
 -- Sprawdza, czy punkt o podanych współrzędnych zawiera prawidłowe sąsiedztwo - nie ma duplikatów
-validateNeighbours :: HoneyComb -> Coords -> Char -> Bool
-validateNeighbours h coords char =
-    all
-    (== False)
-    (
-        map
-        (\
-            (FieldWithCoords _ field) ->
-                case field of
-                    Just c -> c == char
-                    Nothing -> False
+validateNeighbours :: HoneyComb -> Coords -> Bool
+validateNeighbours h coords =
+    -- Sprawdź, czy nie ma duplikatów
+    isListUnique (
+        -- Usuń puste pola
+        catMaybes (
+            -- Z każdego pola z otoczenia pobierz tylko wartość
+            map
+                (\(FieldWithCoords coords field) -> field)
+                ((findFieldNeighbours h coords) ++ [getField h coords])
         )
-        (findFieldNeighbours h coords)
     )
 
-assumeChar :: HoneyComb -> Coords -> Char
-assumeChar h coords =
-    case (\(FieldWithCoords _ f) -> f) $ (getField h coords) of
-        Just a -> a
-        Nothing -> error "Nothing"
-
+-- Sprawdza poprawność całego plastra
 validateHoneyComb :: HoneyComb -> Bool
 validateHoneyComb h = 
-    all (== True) [validateNeighbours h coords (assumeChar h coords) | coords <- getAllCoords h]
+    all (== True) [validateNeighbours h coords | coords <- getAllCoords h]
 
 isSolved :: HoneyComb -> Bool
 isSolved h = 
