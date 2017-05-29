@@ -2,7 +2,7 @@ module Utils where
 
 import Control.Exception.Base
 
--- Zwraca, czy lista lista zawiera wyłącznie unikalne elementy
+-- Zwraca, czy lista zawiera wyłącznie unikalne elementy
 isListUnique :: (Eq a) => [a] -> Bool
 isListUnique [] = True
 isListUnique (x:xs) = notElem x xs && isListUnique xs

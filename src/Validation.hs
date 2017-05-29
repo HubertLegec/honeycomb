@@ -2,9 +2,9 @@ module Validation where
 import Types
 
 -- sprawdź poprawność plastra (liczba wierszy oraz liczba elementów w wierszu)
-validateHoneycomb :: HoneyComb -> Bool
-validateHoneycomb [] = False
-validateHoneycomb (x:xs) = validateRow xs (length x) (length x) 1
+validateInputHoneycomb :: Honeycomb -> Bool
+validateInputHoneycomb [] = False
+validateInputHoneycomb (x:xs) = validateRow xs (length x) (length x) 1
 
 -- sprawdź poprawność wiersza plastra
 validateRow :: [Row] -> Int -> Int -> Int -> Bool

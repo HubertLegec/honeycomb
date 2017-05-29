@@ -3,7 +3,7 @@ module Samples where
 import Solver
 
 -- Z zadania
-honeyComb1 = [
+honeycomb1 = [
         [Just 'B', Just 'D', Nothing, Nothing],
         [Nothing, Just 'G', Just 'A', Nothing, Just 'D'],
         [Nothing, Just 'F', Just 'E', Just 'G'],
@@ -12,7 +12,7 @@ honeyComb1 = [
     ]
 
 -- Z zadania, z uzupełnionym jednym rogiem
-honeyComb2 = [
+honeycomb2 = [
         [Just 'B', Just 'D', Nothing, Nothing],
         [Just 'C', Just 'G', Just 'A', Nothing, Just 'D'],
         [Nothing, Just 'F', Just 'E', Just 'G'],
@@ -21,7 +21,7 @@ honeyComb2 = [
     ]
 
 -- Z zadania, nieprawidłowy
-honeyComb3 = [
+honeycomb3 = [
         [Just 'B', Just 'D', Nothing, Nothing],
         [Just 'B', Just 'G', Just 'A', Nothing, Just 'D'],
         [Nothing, Just 'F', Just 'E', Just 'G'],
@@ -29,14 +29,14 @@ honeyComb3 = [
         [Just 'E', Nothing, Nothing, Nothing]
     ]
 
-honeyComb10 = [
+honeycomb10 = [
         [Just 'C', Just 'E', Just 'C', Just 'B'],
         [Just 'F', Just 'B', Just 'G', Just 'A', Just 'D'],
         [Just 'A', Just 'D', Just 'C', Just 'E'],
         [Just 'C', Just 'E', Just 'F', Just 'B', Just 'G'],
         [Just 'B', Just 'G', Just 'A', Just 'D']
     ]
-honeyComb11 = [
+honeycomb11 = [
         [Just 'C', Just 'E', Just 'F', Just 'B'],
         [Just 'F', Just 'B', Just 'G', Just 'A', Just 'D'],
         [Just 'A', Just 'D', Just 'C', Just 'E'],

@@ -12,7 +12,7 @@ loadHoneycombFromFile = do
                          return plaster
 
 
-saveHoneycombToFile :: Maybe HoneyComb -> IO ()
+saveHoneycombToFile :: Maybe Honeycomb -> IO ()
 saveHoneycombToFile (Just hc) = do
                        let hcText = convertHoneycombToTextRepr hc
                        putStrLn "Podaj nazwe pliku wyjsciowego: "
