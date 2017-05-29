@@ -2,19 +2,19 @@ module FileUtils where
 import Types
 import Converters
 
-loadHoneycombFromFile :: IO TextHoneycomb
-loadHoneycombFromFile = do
+loadHoneyCombFromFile :: IO TextHoneyComb
+loadHoneyCombFromFile = do
                          putStrLn "Podaj nazwe pliku z zagadka:"
                          fileName <- getLine
                          fileText <- readFile fileName
-                         let plaster :: TextHoneycomb
-                             plaster = read fileText :: TextHoneycomb
+                         let plaster :: TextHoneyComb
+                             plaster = read fileText :: TextHoneyComb
                          return plaster
 
 
-saveHoneycombToFile :: Maybe Honeycomb -> IO ()
-saveHoneycombToFile (Just hc) = do
-                       let hcText = convertHoneycombToTextRepr hc
+saveHoneyCombToFile :: Maybe HoneyComb -> IO ()
+saveHoneyCombToFile (Just hc) = do
+                       let hcText = convertHoneyCombToTextRepr hc
                        putStrLn "Podaj nazwe pliku wyjsciowego: "
                        fileName <- getLine
                        let text = show hcText

@@ -8,7 +8,7 @@ import Solver
 import Data.Time
 
 
-findSolution :: Honeycomb -> IO ()
+findSolution :: HoneyComb -> IO ()
 findSolution hc = do
                    start <- getCurrentTime
                    let result = solveOne hc
@@ -20,11 +20,11 @@ findSolution hc = do
 
 main :: IO()
 main = do
-        textHoneycomb <- loadHoneycombFromFile
-        let honeycomb = convertTextReprToHoneycomb textHoneycomb
-        let isValid = validateInputHoneycomb honeycomb
+        textHoneyComb <- loadHoneyCombFromFile
+        let honeycomb = convertTextReprToHoneyComb textHoneyComb
+        let isValid = validateInputHoneyComb honeycomb
         putStrLn ("Wejsciowy plaster: ")
-        showHoneycomb honeycomb
+        showHoneyComb honeycomb
         if isValid then
             findSolution honeycomb
         else

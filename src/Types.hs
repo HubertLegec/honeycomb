@@ -16,7 +16,7 @@ data FieldWithCoords = FieldWithCoords Coords Field deriving (Show)
 type Row = [Field]
 
 -- Typ opisujący cały plaster
-type Honeycomb = [Row]
+type HoneyComb = [Row]
 
 -- Typ opisujący strukturę plastra odpowiadającą strukturze pliku wejściowego
-data TextHoneycomb = Plaster [String] deriving (Read, Show)
+data TextHoneyComb = Plaster [String] deriving (Read, Show)

@@ -15,13 +15,13 @@ showHc (x:xs) num = do
                      showRow x num
                      showHc xs (num + 1)
 
-showHoneycomb h = do
+showHoneyComb h = do
                    putStrLn " ---- honeycomb ---"
                    showHc h 0
                    putStrLn " ------------------"
 
-showResult :: Maybe Honeycomb -> IO()
+showResult :: Maybe HoneyComb -> IO()
 showResult (Just hc) = do
                  putStrLn "Rozwiazanie:"
-                 showHoneycomb hc
+                 showHoneyComb hc
 showResult _ = putStrLn "Nie udalo sie znalezc rozwiazania"

@@ -8,19 +8,18 @@ import Data.Maybe
 
 import Control.Exception.Base
 
+-- Rozwiązuje podany plaster miodu
 solveOne :: HoneyComb -> (Maybe HoneyComb)
 solveOne h =
-    --trace ((honeyCombToString h) ++ "-------------------------------------------------------------------------------------------------------------------------\n\n") (
     if isSolved h then
-        --assert
-        --    (validateHoneyComb h)
             Just h
     else
         let allHoneyCombs = [(coords, char, replaceHoneyComb h coords char) | coords <- getEmptyPointsSortedByNeighboursFillRatio h, char <- honeyCombLetters] in
             let validHoneyCombs = [replacedHoneyComb | (coords, char, replacedHoneyComb) <- allHoneyCombs, validateHoneyComb replacedHoneyComb] in
                 solveList validHoneyCombs
-    --)
 
+-- Pomocnicza funkcja próbująca po kolei rozwiązać każdy z podanych plastrów.
+-- Kończ się w chwili znalezienia pierwszego rozwiązania
 solveList :: [HoneyComb] -> (Maybe HoneyComb)
 solveList [] = Nothing
 solveList (h:tail) =
@@ -33,6 +32,7 @@ solveList (h:tail) =
 honeyCombLetters :: [Char]
 honeyCombLetters = ['A' .. 'G']
 
+-- Zwraca pole o podanych współrzędnych
 getField :: HoneyComb -> Coords -> FieldWithCoords
 getField h (Coords x y) = 
     (FieldWithCoords (Coords x y) (h !! y !! x))
@@ -132,7 +132,7 @@ getNothingCount list =
 
 getEmptyPointsSortedByNeighboursFillRatio :: HoneyComb -> [Coords]
 getEmptyPointsSortedByNeighboursFillRatio h =
-	-- Wytnij tylko współrzędne
+    -- Wytnij tylko współrzędne
     map
     (\
         ((FieldWithCoords coords _), _) ->
@@ -176,6 +176,8 @@ validateHoneyComb :: HoneyComb -> Bool
 validateHoneyComb h = 
     all (== True) [validateNeighbours h coords | coords <- getAllCoords h]
 
+-- Sprawdza, czy podany plaster miodu jest ułożony.
+-- Nie sprawdza poprawności, jedynie uzupełnienie wszystkich pól
 isSolved :: HoneyComb -> Bool
 isSolved h = 
     -- Wszystkie
