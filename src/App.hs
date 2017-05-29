@@ -10,11 +10,7 @@ import Data.Time
 
 findSolution :: Honeycomb -> IO ()
 findSolution hc = do
-                   start <- getCurrentTime
                    let result = solveOne hc
-                   end <- getCurrentTime
-                   putStr "Czas wykonania: "
-                   print (diffUTCTime end start)
                    showResult result
 
 

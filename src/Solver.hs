@@ -200,16 +200,13 @@ validateHoneycomb h =
     &&
     (validateAllNeighbours h (getAllCoords h))
 
+-- sprawdza czy wszystkie pola w wierszu są uzupełnione
+isRowSolved :: Row -> Bool
+isRowSolved [] = True
+isRowSolved (x:xs) = (isJust x) && isRowSolved xs
+
 -- Sprawdza, czy podany plaster miodu jest ułożony.
 -- Nie sprawdza poprawności, jedynie uzupełnienie wszystkich pól
 isSolved :: Honeycomb -> Bool
-isSolved h = 
-    -- Wszystkie
-    all (== True)
-    (
-        -- Pola są uzupełnione
-        map (\ (FieldWithCoords coords field) -> isJust field)
-
-        -- Na liście pól
-        (getAllFields h)
-    )
+isSolved [] = True
+isSolved (x:xs) = (isRowSolved x) && isSolved xs

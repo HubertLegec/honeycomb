@@ -42,7 +42,7 @@ honeycomb11 = [
         [Just 'A', Just 'D', Just 'C', Just 'E'],
         [Just 'C', Just 'E', Just 'F', Just 'B', Just 'G'],
         [Just 'B', Just 'G', Just 'A', Nothing]
-    ]
+
 honeycomb12 = [
         [Nothing, Nothing, Nothing, Nothing],
         [Nothing, Nothing, Nothing, Nothing, Nothing],
@@ -50,3 +50,13 @@ honeycomb12 = [
         [Nothing, Nothing, Nothing, Nothing, Nothing],
         [Nothing, Nothing, Nothing, Nothing]
     ]
+-- duzy przyklad
+honeycomb4 = [
+	    [Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
+	    [Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
+	    [Nothing, Nothing, Just 'C', Just 'B', Just 'A', Just 'D'],
+	    [Nothing, Nothing, Nothing, Nothing, Just 'G', Nothing, Nothing],
+	    [Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
+	    [Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing],
+	    [Nothing, Nothing, Just 'E', Nothing, Nothing, Nothing]
+   ]    ]
